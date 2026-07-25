@@ -1,0 +1,20 @@
+{
+  "title": "Kontaktujte nás",
+  "intro": "Máte zájem o štěňátko, plánujete krytí, nebo se chcete jen na něco zeptat? Napište nám!",
+  "infoTitle": "Naše údaje",
+  "addressLabel": "📍 Adresa:",
+  "addressValue": "Psí Lhota 123, 110 00 (Zde doplň své)",
+  "phoneLabel": "📞 Telefon:",
+  "emailLabel": "✉️ E-mail:",
+  "instagramLabel": "📸 Instagram:",
+  "mapPlaceholder": "Místo pro Google Mapu",
+  "formTitle": "Napište nám zprávu",
+  "nameLabel": "Vaše jméno:",
+  "namePlaceholder": "Jan Novák",
+  "emailLabel": "Váš e-mail:",
+  "emailPlaceholder": "jan@email.cz",
+  "messageLabel": "Zpráva:",
+  "messagePlaceholder": "Dobrý den, měl bych zájem o...",
+  "submitButton": "Odeslat zprávu",
+  "successAlert": "Děkujeme za zprávu! Ozveme se vám co nejdříve."
+}

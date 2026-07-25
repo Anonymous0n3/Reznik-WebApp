@@ -1,0 +1,32 @@
+/* src/pages/Home.css */
+.home-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.hero-banner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border-radius: 12px;
+    padding: 2rem;
+    /* Pro reálnou fotku nahraď background-color obrázkem: 
+     background: url('/cesta-k-fotce.jpg') center/cover; */
+}
+
+    .hero-banner h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+.intro-section {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}

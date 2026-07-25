@@ -1,0 +1,72 @@
+/* src/components/common/Navbar.css */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--primary-color);
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-logo a {
+    color: var(--text-light);
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.navbar-links {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+}
+
+    .navbar-links a {
+        color: var(--secondary-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+        .navbar-links a:hover {
+            color: var(--text-light);
+        }
+
+        /* Zvýraznění aktivní stránky */
+        .navbar-links a.active {
+            color: var(--text-light);
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+/* Styly pro přepínač jazyků v navigaci */
+.language-switcher {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--secondary-color);
+}
+
+    .language-switcher button {
+        background: none;
+        border: none;
+        color: var(--secondary-color);
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 1rem;
+        padding: 0.2rem 0.5rem;
+        transition: color 0.2s ease;
+    }
+
+        .language-switcher button:hover {
+            color: var(--text-light);
+        }
+
+        .language-switcher button.active-lang {
+            color: var(--text-light);
+            font-weight: bold;
+            border-bottom: 2px solid var(--text-light);
+        }
+
+.lang-divider {
+    opacity: 0.5;
+}

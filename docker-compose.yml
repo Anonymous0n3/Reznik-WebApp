@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # 1. The Unified Web App (React + ASP.NET)
+  webapp:
+    build:
+      # CRITICAL: The build context must be the root folder (where your .slnx is) 
+      # so Docker can see BOTH the client and server folders.
+      context: . 
+      # Point to the specific Dockerfile inside the server folder
+      dockerfile: Reznik-WebApp.Server/Dockerfile 
+    ports:
+      - "8080:8080" # Matches the EXPOSE 8080 in your Dockerfile
+    environment:
+      # ASP.NET Core environment variable for the connection string
+      - ConnectionStrings__DefaultConnection=Host=postgres-db;Database=my_app_db;Username=admin;Password=secretpassword
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - postgres-db
+    volumes:
+      # Map a local folder for those image uploads we discussed earlier
+      - ./uploads:/app/uploads 
+
+  # 2. The PostgreSQL Database
+  postgres-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: my_app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:

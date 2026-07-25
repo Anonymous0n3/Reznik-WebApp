@@ -1,0 +1,18 @@
+/* src/pages/Dogs.css */
+.dogs-page h1 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.dogs-intro {
+    margin-bottom: 2rem;
+    color: #555;
+    font-size: 1.1rem;
+}
+
+/* CSS Grid se postará o to, aby byly karty hezky vedle sebe a zalamovaly se na mobilech */
+.dogs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}

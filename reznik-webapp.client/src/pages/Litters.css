@@ -1,0 +1,152 @@
+/* src/pages/Litters.css */
+.litters-page h1 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.litters-intro {
+    margin-bottom: 2rem;
+    color: #555;
+    font-size: 1.1rem;
+}
+
+/* --- Mřížka pro aktuální štěňata (využívá DogCard) --- */
+.puppies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* --- Zobrazení pro plánované vrhy --- */
+.planned-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.planned-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid var(--primary-color);
+}
+
+    .planned-card h2 {
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+
+.planned-details {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.planned-desc {
+    margin-bottom: 1.5rem;
+    color: #555;
+}
+
+/* --- Interaktivní štítek pro rezervace --- */
+.reservation-status.interactive {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--secondary-color);
+    color: var(--text-dark);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    margin-top: 0.5rem;
+}
+
+    .reservation-status.interactive:hover {
+        background-color: #e5dac1;
+        transform: translateY(-2px);
+    }
+
+    .reservation-status.interactive:active {
+        transform: translateY(0);
+    }
+
+.dropdown-arrow {
+    font-size: 0.75rem;
+    color: #777;
+    margin-left: 0.3rem;
+}
+
+/* --- Seznam, který se rozbalí pod štítkem --- */
+.reservations-list {
+    margin-top: 1.5rem;
+    background-color: var(--bg-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--reserved-color);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+    .reservations-list h4 {
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+    }
+
+    .reservations-list ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .reservations-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap; /* Oprava mezery z předchozího kroku */
+        gap: 1rem;
+        background: white;
+        padding: 0.8rem 1rem;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+.res-name {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.res-gender {
+    font-size: 0.9rem;
+    color: #666;
+    background: #f0f0f0;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+}
+
+/* Animace pro plynulé zobrazení seznamu */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responzivita pro mobilní zařízení */
+@media (max-width: 600px) {
+    .reservations-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+}

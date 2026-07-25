@@ -1,0 +1,6 @@
+@Reznik_WebApp.Server_HostAddress = http://localhost:5236
+
+GET {{Reznik_WebApp.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

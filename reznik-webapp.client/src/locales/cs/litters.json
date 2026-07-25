@@ -1,0 +1,20 @@
+{
+  "litterWord": "Vrh",
+  "expectedDate": "Očekávané narození",
+  "expectedCount": "Předpoklad",
+  "clickToToggle": "Kliknutím zobrazíte detail rezervací",
+  "reserved": "Zarezervováno",
+  "interested": "zájemců",
+  "reservationsListTitle": "Seznam zájemců",
+  "preference": "Preference",
+  "male": "Pes ♂",
+  "female": "Fena ♀",
+  "any": "Nezáleží",
+  "noReservations": "Zatím žádné rezervace. Vrh je plně volný!",
+  "currentTitle": "Aktuální štěňata",
+  "currentIntro": "Zde představujeme štěňátka, která máme momentálně na stanici.",
+  "noCurrentPuppies": "Momentálně nemáme žádná volná štěňata.",
+  "plannedTitle": "Plánované vrhy",
+  "plannedIntro": "Podívejte se, jaká štěňátka plánujeme v nejbližší době.",
+  "noPlannedLitters": "Momentálně neplánujeme žádné vrhy."
+}

@@ -1,0 +1,20 @@
+{
+  "litterWord": "Litter",
+  "expectedDate": "Expected birth",
+  "expectedCount": "Expected puppies",
+  "clickToToggle": "Click to show reservation details",
+  "reserved": "Reserved",
+  "interested": "interested",
+  "reservationsListTitle": "List of reservations",
+  "preference": "Preference",
+  "male": "Male ♂",
+  "female": "Female ♀",
+  "any": "Any",
+  "noReservations": "No reservations yet. The litter is fully available!",
+  "currentTitle": "Current Puppies",
+  "currentIntro": "Here we present the puppies currently at our kennel.",
+  "noCurrentPuppies": "We currently do not have any available puppies.",
+  "plannedTitle": "Planned Litters",
+  "plannedIntro": "Take a look at the litters we are planning in the near future.",
+  "noPlannedLitters": "We do not have any planned litters at the moment."
+}
