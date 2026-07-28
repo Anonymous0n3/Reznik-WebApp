@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Položky řešení/">
+    <File Path="Caddyfile" />
     <File Path="docker-compose.yml" />
   </Folder>
   <Project Path="reznik-webapp.client/reznik-webapp.client.esproj">

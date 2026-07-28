@@ -7,7 +7,6 @@ export default function MainLayout() {
         <div className="app-container">
             <Navbar />
 
-            {/* Zde se bude měnit obsah podle toho, na jaké jsme URL */}
             <main className="main-content">
                 <Outlet />
             </main>

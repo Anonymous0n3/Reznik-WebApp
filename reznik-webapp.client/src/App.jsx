@@ -5,16 +5,22 @@ import Dogs from './pages/Dogs';
 import Litters from './pages/Litters';
 import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
+import Login from './pages/Login';
+import Admin from './pages/AdminDashboard';
+import AdminDogs from './pages/AdminDogs';
+import AdminLitters from './pages/AdminLitters';
+import AdminReservations from './pages/AdminReservations';
+import AdminUsers from './pages/AdminUsers'
+import AdminGallery from './pages/AdminGallery';
+import AdminPuppies from './pages/AdminPuppies';
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
-                {/* Layout obaluje všechny veřejné stránky */}
                 <Route path="/" element={<MainLayout />}>
                     <Route index element={<Home />} />
 
-                    {/* Stránku Dogs znovupoužijeme, jen jí předáme jinou prop */}
                     <Route path="holky" element={<Dogs gender="female" />} />
                     <Route path="kluci" element={<Dogs gender="male" />} />
 
@@ -23,6 +29,16 @@ function App() {
 
                     <Route path="galerie" element={<Gallery />} />
                     <Route path="kontakt" element={<Contact />} />
+                    <Route path="login" element={<Login />} />
+                    <Route path="admin" element={<Admin />} />
+
+                    <Route path="admin/dogs" element={<AdminDogs />} />
+                    <Route path="admin/litters" element={<AdminLitters />} />
+                    <Route path="/admin/reservations" element={<AdminReservations />} />
+                    <Route path="/admin/users" element={<AdminUsers />} />
+                    <Route path="/admin/gallery" element={<AdminGallery />} />
+                    <Route path="/admin/puppies" element={<AdminPuppies />} />
+
                 </Route>
             </Routes>
         </BrowserRouter>

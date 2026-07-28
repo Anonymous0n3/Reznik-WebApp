@@ -1,37 +1,44 @@
-version: '3.8'
-
 services:
-  # 1. The Unified Web App (React + ASP.NET)
   webapp:
     build:
-      # CRITICAL: The build context must be the root folder (where your .slnx is) 
-      # so Docker can see BOTH the client and server folders.
       context: . 
-      # Point to the specific Dockerfile inside the server folder
       dockerfile: Reznik-WebApp.Server/Dockerfile 
-    ports:
-      - "8080:8080" # Matches the EXPOSE 8080 in your Dockerfile
     environment:
-      # ASP.NET Core environment variable for the connection string
-      - ConnectionStrings__DefaultConnection=Host=postgres-db;Database=my_app_db;Username=admin;Password=secretpassword
+      - ConnectionStrings__DefaultConnection=Host=postgres-db;Database=ReznikDb;Username=admin;Password=secretpassword
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080 # Přidáno, aby aplikace věděla, že má poslouchat pro Caddy na 8080
     depends_on:
       - postgres-db
-    volumes:
-      # Map a local folder for those image uploads we discussed earlier
-      - ./uploads:/app/uploads 
+    volumes: 
+      - ./wwwroot/uploads:/app/wwwroot/uploads 
+      # ./https:/https/ jsme smazali, protože certifikáty teď řeší Caddy, ne aplikace
 
-  # 2. The PostgreSQL Database
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - webapp
+
   postgres-db:
     image: postgres:15
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: secretpassword
-      POSTGRES_DB: my_app_db
+      POSTGRES_DB: ReznikDb
     ports:
       - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+# TADY byla ta chyba - musíme definovat všechny pojmenované volumes pro celý projekt
 volumes:
   pg_data:
+  caddy_data:
+  caddy_config:

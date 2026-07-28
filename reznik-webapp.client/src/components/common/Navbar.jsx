@@ -1,12 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { useTranslation } from 'react-i18next'; // Import funkce pro překlad
+import { useTranslation } from 'react-i18next';
 import './Navbar.css';
 
 export default function Navbar() {
-    // 't' je funkce, kterou překládáme texty. 'i18n' používáme pro změnu jazyka.
     const { t, i18n } = useTranslation();
 
-    // Funkce pro přepnutí jazyka
     const changeLanguage = (lng) => {
         i18n.changeLanguage(lng);
     };
@@ -24,13 +22,14 @@ export default function Navbar() {
                 <li><NavLink to="/planovane-vrhy">{t('nav.planned')}</NavLink></li>
                 <li><NavLink to="/galerie">{t('nav.gallery')}</NavLink></li>
                 <li><NavLink to="/kontakt">{t('nav.contact')}</NavLink></li>
+                <li><NavLink to="/login" className="admin-link">Admin</NavLink></li>
             </ul>
 
-            {/* Přepínač jazyků */}
             <div className="language-switcher">
                 <button
                     className={i18n.language === 'cs' ? 'active-lang' : ''}
                     onClick={() => changeLanguage('cs')}
+                    aria-label="Přepnout na češtinu"
                 >
                     CZ
                 </button>
@@ -38,6 +37,7 @@ export default function Navbar() {
                 <button
                     className={i18n.language === 'en' ? 'active-lang' : ''}
                     onClick={() => changeLanguage('en')}
+                    aria-label="Switch to English"
                 >
                     EN
                 </button>

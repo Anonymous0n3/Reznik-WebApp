@@ -1,31 +1,9 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next'; // 1. Import lokalizace
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './Contact.css';
 
 export default function Contact() {
-    const { t } = useTranslation(); // 2. Hook pro překlady
-
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        message: ''
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        console.log('Odesílaná data:', formData);
-
-        // 3. Překlad i uvnitř alertu
-        alert(t('contact.successAlert'));
-
-        setFormData({ name: '', email: '', message: '' });
-    };
+    const { t } = useTranslation();
 
     return (
         <div className="contact-page">
@@ -35,70 +13,18 @@ export default function Contact() {
             </p>
 
             <div className="contact-container">
-                {/* Levý sloupec: Údaje a mapa */}
                 <div className="contact-info">
                     <h2>{t('contact.infoTitle')}</h2>
                     <ul>
-                        <li><strong>{t('contact.addressLabel')}</strong> {t('contact.addressValue')}</li>
-                        <li><strong>{t('contact.phoneLabel')}</strong> +420 123 456 789</li>
-                        <li><strong>{t('contact.emailLabel')}</strong> info@chovatelskastanice.cz</li>
-                        <li><strong>{t('contact.instagramLabel')}</strong> @nase_stanice</li>
+                        <li><strong>{t('contact.addressLabel')}:</strong> {t('contact.addressValue')}</li>
+                        <li><strong>{t('contact.phoneLabel')}:</strong> +420 123 456 789</li>
+                        <li><strong>{t('contact.emailLabel')}:</strong> info@chovatelskastanice.cz</li>
+                        <li><strong>{t('contact.instagramLabel')}:</strong> @nase_stanice</li>
                     </ul>
 
                     <div className="map-placeholder">
-                        <div className="map-mockup">
-                            {t('contact.mapPlaceholder')}
-                        </div>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d635.2943888871847!2d15.126687808239543!3d50.437793339033384!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470ea9542004c445%3A0xc1b811634e0d5ced!2zTMOpa8Ohcm5hIERvbG7DrSBCb3Vzb3Ygcy5yLm8u!5e0!3m2!1scs!2scz!4v1785246712811!5m2!1scs!2scz" width="100%" height="450" style={{ border: 0 }} allowFullScreen="" loading="lazy" referrerPolicy="strict-origin-when-cross-origin"></iframe>
                     </div>
-                </div>
-
-                {/* Pravý sloupec: Formulář */}
-                <div className="contact-form-wrapper">
-                    <h2>{t('contact.formTitle')}</h2>
-                    <form onSubmit={handleSubmit} className="contact-form">
-                        <div className="form-group">
-                            <label htmlFor="name">{t('contact.nameLabel')}</label>
-                            <input
-                                type="text"
-                                id="name"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                placeholder={t('contact.namePlaceholder')}
-                                required
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="email">{t('contact.emailLabel')}</label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder={t('contact.emailPlaceholder')}
-                                required
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="message">{t('contact.messageLabel')}</label>
-                            <textarea
-                                id="message"
-                                name="message"
-                                rows="6"
-                                value={formData.message}
-                                onChange={handleChange}
-                                placeholder={t('contact.messagePlaceholder')}
-                                required
-                            ></textarea>
-                        </div>
-
-                        <button type="submit" className="submit-button">
-                            {t('contact.submitButton')}
-                        </button>
-                    </form>
                 </div>
             </div>
         </div>

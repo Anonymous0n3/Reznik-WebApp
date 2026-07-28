@@ -1,14 +1,27 @@
 import { useTranslation } from 'react-i18next';
 import './Home.css';
 
+import heroImage from '../assets/react.svg';
+
 export default function Home() {
     const { t } = useTranslation();
 
     return (
         <div className="home-page">
-            <header className="hero-banner" style={{ height: '400px', backgroundColor: '#ddd' }}>
-                <h1>{t('home.welcomeTitle')}</h1>
-                <p>{t('home.welcomeSub')}</p>
+            <header
+                className="hero-banner"
+                style={{
+                    height: '400px',
+                    backgroundImage: `url(${heroImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    color: '#fff'
+                }}
+            >
+                <div className="banner-content">
+                    <h1>{t('home.welcomeTitle')}</h1>
+                    <p>{t('home.welcomeSub')}</p>
+                </div>
             </header>
 
             <section className="intro-section">

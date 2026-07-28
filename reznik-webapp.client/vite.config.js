@@ -47,9 +47,14 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '^/weatherforecast': {
-                target,
-                secure: false
+            '/api': {
+                target: 'http://localhost:8080', // Tvůj backend
+                changeOrigin: true,
+            },
+            // PŘIDEJ TOTO:
+            '/uploads': {
+                target: 'http://localhost:8080',
+                changeOrigin: true,
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '58797'),

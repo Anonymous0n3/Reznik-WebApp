@@ -1,16 +1,35 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next'; // 1. Import lokalizace
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DogCard from '../components/common/DogCard';
 import './Litters.css';
 
-// Nová pomocná komponenta pro jeden plánovaný vrh
 function PlannedLitterCard({ litter }) {
-    const { t } = useTranslation(); // 2. Hook pro tuto komponentu
+    const { t } = useTranslation();
     const [showReservations, setShowReservations] = useState(false);
+
+    const [reservations, setReservations] = useState([]);
+    const [isLoadingRes, setIsLoadingRes] = useState(false);
+
+    useEffect(() => {
+        const fetchReservations = async () => {
+            setIsLoadingRes(true);
+            try {
+                const response = await fetch(`/api/Reservations/bylitter/${litter.id}`);
+                if (response.ok) {
+                    setReservations(await response.json());
+                }
+            } catch (err) {
+                console.error("Chyba při načítání rezervací", err);
+            } finally {
+                setIsLoadingRes(false);
+            }
+        };
+        fetchReservations();
+    }, [litter.id]);
 
     return (
         <div className="planned-card">
-            <h2>{t('litters.litterWord')}: {litter.dam} ♀ × {litter.sire} ♂</h2>
+            <h2>{t('litters.litterWord')}: {litter.dam?.name || 'Neznámá'} ♀ × {litter.sire?.name || 'Neznámý'} ♂</h2>
 
             <div className="planned-details">
                 <p><strong>{t('litters.expectedDate')}:</strong> {litter.expectedDate}</p>
@@ -24,7 +43,7 @@ function PlannedLitterCard({ litter }) {
                 onClick={() => setShowReservations(!showReservations)}
                 title={t('litters.clickToToggle')}
             >
-                {t('litters.reserved')}: <strong>{litter.reservations.length} {t('litters.interested')}</strong>
+                {t('litters.reserved')}: <strong>{isLoadingRes ? '...' : reservations.length} {t('litters.interested')}</strong>
                 <span className="dropdown-arrow">{showReservations ? '▲' : '▼'}</span>
             </div>
 
@@ -32,8 +51,8 @@ function PlannedLitterCard({ litter }) {
                 <div className="reservations-list">
                     <h4>{t('litters.reservationsListTitle')}:</h4>
                     <ul>
-                        {litter.reservations.length > 0 ? (
-                            litter.reservations.map(res => (
+                        {reservations.length > 0 ? (
+                            reservations.map(res => (
                                 <li key={res.id}>
                                     <span className="res-name">{res.name}</span>
                                     <span className="res-gender">
@@ -52,79 +71,77 @@ function PlannedLitterCard({ litter }) {
 }
 
 export default function Litters({ status }) {
-    const { t } = useTranslation(); // 3. Hook pro hlavní komponentu
+    const { t } = useTranslation();
 
-    // Testovací data (v reálu se budou texty 'description' tahat z DB už ve správném jazyce)
-    const currentPuppies = [
-        {
-            id: 101,
-            name: 'Argo (Vrh A)',
-            gender: 'male',
-            image: 'https://images.unsplash.com/photo-1591160690555-5debfba289f0?auto=format&fit=crop&w=500&q=60',
-            description: 'Zelený obojek. Velmi aktivní a zvědavý pejsek.',
-            isReserved: true,
-        },
-        {
-            id: 102,
-            name: 'Aura (Vrh A)',
-            gender: 'female',
-            image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=500&q=60',
-            description: 'Červený obojek. Klidnější fenka, vhodná do rodiny s dětmi.',
-            isReserved: false,
-        }
-    ];
+    const [litters, setLitters] = useState([]);
+    const [puppies, setPuppies] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const plannedLitters = [
-        {
-            id: 201,
-            sire: 'Max',
-            dam: 'Bella',
-            expectedDate: 'Podzim 2026',
-            expectedCount: '6-8 štěňat',
-            description: 'Očekáváme vyrovnaná štěňata s výborným předpokladem pro výstavy i sport.',
-            reservations: [
-                { id: 1, name: 'Rodina Novákova', preferredGender: 'male' },
-                { id: 2, name: 'Jan K.', preferredGender: 'female' },
-                { id: 3, name: 'Petra S.', preferredGender: 'any' },
-                { id: 4, name: 'Zarezervováno (Německo)', preferredGender: 'male' }
-            ]
-        },
-        {
-            id: 202,
-            sire: 'Bady',
-            dam: 'Luna',
-            expectedDate: 'Jaro 2027',
-            expectedCount: '4-6 štěňat',
-            description: 'První vrh naší Luny. Očekáváme klidné a vyrovnané povahy.',
-            reservations: [
-                { id: 5, name: 'Karel Z.', preferredGender: 'female' }
-            ]
-        }
-    ];
+    useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
+            try {
+                const littersRes = await fetch('/api/Litters');
+                if (!littersRes.ok) throw new Error('Failed to fetch litters');
+                const allLitters = await littersRes.json();
+
+                const activeLitters = allLitters.filter(l => l.status === status);
+                setLitters(activeLitters);
+
+                if (status === 'current') {
+                    const puppiesPromises = activeLitters.map(l =>
+                        fetch(`/api/Puppies/bylitter/${l.id}`).then(res => res.json())
+                    );
+
+                    const puppiesArrays = await Promise.all(puppiesPromises);
+                    setPuppies(puppiesArrays.flat());
+                }
+            } catch (err) {
+                setError(t('common.errorNetwork', 'Chyba sítě při načítání dat.'));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
+    }, [status, t]);
 
     return (
         <div className="litters-page">
-            {status === 'current' ? (
+            {isLoading && <p className="loading-text">{t('common.loading', 'Načítám...')}</p>}
+            {error && <p className="error-text">{error}</p>}
+
+            {!isLoading && !error && status === 'current' && (
                 <>
                     <h1>{t('litters.currentTitle')}</h1>
                     <p className="litters-intro">{t('litters.currentIntro')}</p>
-                    <div className="puppies-grid">
-                        {currentPuppies.length > 0 ? (
-                            currentPuppies.map(puppy => (
-                                <DogCard key={puppy.id} {...puppy} />
+                    <div className="puppies-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                        {puppies.length > 0 ? (
+                            puppies.map(puppy => (
+                                <DogCard
+                                    key={puppy.id}
+                                    name={puppy.name}
+                                    image={puppy.imageUrl}
+                                    description={puppy.colorInfo}
+                                    gender={puppy.gender}
+                                    isReserved={puppy.status !== 'available'}
+                                />
                             ))
                         ) : (
                             <p>{t('litters.noCurrentPuppies')}</p>
                         )}
                     </div>
                 </>
-            ) : (
+            )}
+
+            {!isLoading && !error && status === 'planned' && (
                 <>
                     <h1>{t('litters.plannedTitle')}</h1>
                     <p className="litters-intro">{t('litters.plannedIntro')}</p>
-                    <div className="planned-grid">
-                        {plannedLitters.length > 0 ? (
-                            plannedLitters.map(litter => (
+                    <div className="planned-grid" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        {litters.length > 0 ? (
+                            litters.map(litter => (
                                 <PlannedLitterCard key={litter.id} litter={litter} />
                             ))
                         ) : (

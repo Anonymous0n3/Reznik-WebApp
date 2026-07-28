@@ -1,0 +1,83 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Reznik_WebApp.Server.Models;
+
+namespace Reznik_WebApp.Server.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class OurDogsController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public OurDogsController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDogs()
+        {
+            var dogs = await _context.Dogs.ToListAsync();
+            return Ok(dogs);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AddDog([FromBody] Dog newDog)
+        {
+            if (newDog == null)
+            {
+                return BadRequest("Neplatná data.");
+            }
+
+            _context.Dogs.Add(newDog);
+            await _context.SaveChangesAsync();
+
+            return Ok(newDog);
+        }
+
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateDog(int id, [FromBody] Dog updatedDog)
+        {
+            if (id != updatedDog.Id)
+            {
+                return BadRequest("ID v adrese se neshoduje s ID v zaslaných datech.");
+            }
+
+            var existingDog = await _context.Dogs.FindAsync(id);
+            if (existingDog == null)
+            {
+                return NotFound("Pes s tímto ID neexistuje.");
+            }
+
+            existingDog.Name = updatedDog.Name;
+            existingDog.Gender = updatedDog.Gender;
+            existingDog.Description = updatedDog.Description;
+            existingDog.ImageUrl = updatedDog.ImageUrl;
+            existingDog.IsReserved = updatedDog.IsReserved;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(existingDog);
+        }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDog(int id)
+        {
+            var dog = await _context.Dogs.FindAsync(id);
+            if (dog == null)
+            {
+                return NotFound("Pes s tímto ID neexistuje.");
+            }
+
+            _context.Dogs.Remove(dog);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+    }
+}
