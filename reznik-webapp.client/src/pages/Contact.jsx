@@ -17,9 +17,9 @@ export default function Contact() {
                     <h2>{t('contact.infoTitle')}</h2>
                     <ul>
                         <li><strong>{t('contact.addressLabel')}:</strong> {t('contact.addressValue')}</li>
-                        <li><strong>{t('contact.phoneLabel')}:</strong> +420 123 456 789</li>
-                        <li><strong>{t('contact.emailLabel')}:</strong> info@chovatelskastanice.cz</li>
-                        <li><strong>{t('contact.instagramLabel')}:</strong> @nase_stanice</li>
+                        <li><strong>{t('contact.phoneLabel')}:</strong> {t('contact.phonePlaceHolder')}</li>
+                        <li><strong>{t('contact.emailLabel')}:</strong> {t('contact.emailPlaceHolder')}</li>
+                        <li><strong>{t('contact.instagramLabel')}:</strong> {t('contact.instagramPlaceHolder')}</li>
                     </ul>
 
                     <div className="map-placeholder">

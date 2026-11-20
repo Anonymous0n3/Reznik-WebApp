@@ -5,16 +5,10 @@
   "addressLabel": "📍 Adresa:",
   "addressValue": "Psí Lhota 123, 110 00 (Zde doplň své)",
   "phoneLabel": "📞 Telefon:",
+  "phonePlaceHolder": "+420 737 602 640",
   "emailLabel": "✉️ E-mail:",
+  "emailPlaceHolder": "westauto1@seznam.cz",
   "instagramLabel": "📸 Instagram:",
-  "mapPlaceholder": "Místo pro Google Mapu",
-  "formTitle": "Napište nám zprávu",
-  "nameLabel": "Vaše jméno:",
-  "namePlaceholder": "Jan Novák",
-  "emailLabel": "Váš e-mail:",
-  "emailPlaceholder": "jan@email.cz",
-  "messageLabel": "Zpráva:",
-  "messagePlaceholder": "Dobrý den, měl bych zájem o...",
-  "submitButton": "Odeslat zprávu",
-  "successAlert": "Děkujeme za zprávu! Ozveme se vám co nejdříve."
+  "instagramPlaceHolder": "@placeholder"
+
 }

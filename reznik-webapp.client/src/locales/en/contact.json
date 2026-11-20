@@ -5,16 +5,9 @@
   "addressLabel": "📍 Address:",
   "addressValue": "Dog Street 123, 110 00 (Fill yours here)",
   "phoneLabel": "📞 Phone:",
+  "phonePlaceHolder":  "+420 737 602 640",
   "emailLabel": "✉️ Email:",
+  "emailPlaceHolder": "westauto1@seznam.cz",
   "instagramLabel": "📸 Instagram:",
-  "mapPlaceholder": "Google Maps Placeholder",
-  "formTitle": "Send us a message",
-  "nameLabel": "Your Name:",
-  "namePlaceholder": "John Doe",
-  "emailLabel": "Your Email:",
-  "emailPlaceholder": "john@email.com",
-  "messageLabel": "Message:",
-  "messagePlaceholder": "Hello, I would be interested in...",
-  "submitButton": "Send Message",
-  "successAlert": "Thank you for your message! We will get back to you as soon as possible."
+  "instagramPlaceHolder":  "@placeholder"
 }
