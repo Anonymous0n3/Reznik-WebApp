@@ -13,6 +13,8 @@ namespace Reznik_WebApp.Server
         public DbSet<AdminUser> AdminUsers { get; set; }
         public DbSet<GalleryImage> GalleryImages { get; set; }
         public DbSet<Puppy> Puppies { get; set; }
+        public DbSet<DogImage> DogImages { get; set; }
+        public DbSet<PuppyImage> PuppyImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

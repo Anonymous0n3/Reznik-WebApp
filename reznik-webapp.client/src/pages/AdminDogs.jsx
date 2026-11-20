@@ -13,8 +13,9 @@ export default function AdminDogs() {
     const [description, setDescription] = useState('');
     const [isReserved, setIsReserved] = useState(false);
 
-    const [imageFile, setImageFile] = useState(null);
-    const [currentImageUrl, setCurrentImageUrl] = useState('');
+    // ZMĚNA: Stavy pro více souborů a existujících obrázků
+    const [imageFiles, setImageFiles] = useState([]);
+    const [existingImages, setExistingImages] = useState([]);
 
     useEffect(() => {
         fetchDogs();
@@ -36,8 +37,8 @@ export default function AdminDogs() {
         setGender('female');
         setDescription('');
         setIsReserved(false);
-        setImageFile(null);
-        setCurrentImageUrl('');
+        setImageFiles([]);
+        setExistingImages([]);
         setEditingDogId(null);
 
         const fileInput = document.getElementById('dog-image-input');
@@ -50,10 +51,16 @@ export default function AdminDogs() {
         setGender(dog.gender);
         setDescription(dog.description || '');
         setIsReserved(dog.isReserved);
-        setCurrentImageUrl(dog.imageUrl || '');
-        setImageFile(null);
+        // Načteme existující fotky z databáze
+        setExistingImages(dog.images || []);
+        setImageFiles([]);
         setMessage('');
         setError('');
+    };
+
+    // Funkce pro smazání existující fotky z náhledu před uložením
+    const handleRemoveExistingImage = (indexToRemove) => {
+        setExistingImages(prev => prev.filter((_, index) => index !== indexToRemove));
     };
 
     const handleSubmit = async (e) => {
@@ -61,29 +68,33 @@ export default function AdminDogs() {
         setError('');
         setMessage('Nahrávám data...');
 
-        let finalImageUrl = currentImageUrl;
+        let newlyUploadedImages = [];
 
-        if (imageFile) {
-            const formData = new FormData();
-            formData.append('file', imageFile);
+        // 1. Nahrání všech nových fotek na server postupně (pokud nějaké jsou)
+        if (imageFiles.length > 0) {
+            for (let i = 0; i < imageFiles.length; i++) {
+                const formData = new FormData();
+                formData.append('file', imageFiles[i]);
 
-            try {
-                const uploadResponse = await fetch('/api/Upload', {
-                    method: 'POST',
-                    credentials: 'include',
-                    body: formData
-                });
+                try {
+                    const uploadResponse = await fetch('/api/Upload', {
+                        method: 'POST',
+                        credentials: 'include',
+                        body: formData
+                    });
 
-                if (uploadResponse.ok) {
-                    const data = await uploadResponse.json();
-                    finalImageUrl = data.imageUrl;
-                } else {
-                    setError('Chyba při nahrávání fotky.');
+                    if (uploadResponse.ok) {
+                        const data = await uploadResponse.json();
+                        // Ukládáme v požadovaném formátu pro naši databázi
+                        newlyUploadedImages.push({ url: data.imageUrl });
+                    } else {
+                        setError(`Chyba při nahrávání fotky č. ${i + 1}.`);
+                        return; // Přerušíme uložení, pokud se některá fotka nenahraje
+                    }
+                } catch (err) {
+                    setError('Síťová chyba při nahrávání fotek.');
                     return;
                 }
-            } catch (err) {
-                setError('Síťová chyba při nahrávání fotky.');
-                return;
             }
         }
 
@@ -91,13 +102,20 @@ export default function AdminDogs() {
         const url = isEditing ? `/api/OurDogs/${editingDogId}` : '/api/OurDogs';
         const method = isEditing ? 'PUT' : 'POST';
 
+        // 2. Spojení ponechaných starých fotek a nově nahraných fotek
+        // (EF Core v našem backendu maže staré a ukládá všechny poslané)
+        const finalImagesList = [
+            ...existingImages.map(img => ({ url: img.url })), // Původní ponechané fotky
+            ...newlyUploadedImages // Nové fotky
+        ];
+
         const dogData = {
             id: isEditing ? editingDogId : 0,
             name,
             gender,
             description,
             isReserved,
-            imageUrl: finalImageUrl
+            images: finalImagesList // Posíláme pole fotek
         };
 
         try {
@@ -150,17 +168,51 @@ export default function AdminDogs() {
                     </div>
 
                     <div className="form-group">
-                        <label>Fotografie (nepovinné):</label>
+                        <label>Fotografie:</label>
+                        {/* ZMĚNA: Přidán atribut 'multiple' a upraven onChange */}
                         <input
                             id="dog-image-input"
                             type="file"
                             accept="image/*"
-                            onChange={e => setImageFile(e.target.files[0])}
+                            multiple
+                            onChange={e => setImageFiles(Array.from(e.target.files))}
                         />
-                        {currentImageUrl && !imageFile && (
+
+                        {/* Zobrazení vybraných NOVÝCH souborů (názvy) */}
+                        {imageFiles.length > 0 && (
                             <div style={{ marginTop: '10px' }}>
-                                <small>Aktuální fotka:</small><br />
-                                <img src={currentImageUrl} alt="Aktuální" style={{ width: '100px', borderRadius: '5px' }} />
+                                <small>Nové fotky k nahrání:</small>
+                                <ul>
+                                    {imageFiles.map((file, i) => (
+                                        <li key={i}>{file.name}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* Zobrazení a správa EXISTUJÍCÍCH fotek z DB */}
+                        {existingImages.length > 0 && (
+                            <div style={{ marginTop: '15px' }}>
+                                <small>Aktuální uložené fotky (kliknutím na X fotku smažete):</small>
+                                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '5px' }}>
+                                    {existingImages.map((img, index) => (
+                                        <div key={index} style={{ position: 'relative' }}>
+                                            <img src={img.url} alt={`Uložená ${index}`} style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '5px' }} />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveExistingImage(index)}
+                                                style={{
+                                                    position: 'absolute', top: '-5px', right: '-5px',
+                                                    background: 'red', color: 'white', border: 'none',
+                                                    borderRadius: '50%', width: '24px', height: '24px',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -201,25 +253,38 @@ export default function AdminDogs() {
             <div className="admin-list-section">
                 <h2>Naše smečka ({dogs.length})</h2>
                 <div className="dogs-grid">
-                    {dogs.map(dog => (
-                        <div key={dog.id} className={`dog-card ${editingDogId === dog.id ? 'editing' : ''}`}>
-                            {dog.imageUrl ? (
-                                <img src={dog.imageUrl} alt={dog.name} className="dog-card-img" />
-                            ) : (
-                                <div className="dog-card-placeholder">Bez fotky</div>
-                            )}
+                    {dogs.map(dog => {
+                        // ZMĚNA: Bereme první fotku z pole pro náhled
+                        const hasImages = dog.images && dog.images.length > 0;
+                        const mainImageUrl = hasImages ? dog.images[0].url : null;
 
-                            <h3>{dog.name}</h3>
-                            <span className={`badge ${dog.gender}`}>{dog.gender === 'male' ? 'Pes' : 'Fena'}</span>
-                            {dog.isReserved && <span className="badge reserved">Zadáno</span>}
-                            <p>{dog.description}</p>
+                        return (
+                            <div key={dog.id} className={`dog-card ${editingDogId === dog.id ? 'editing' : ''}`}>
+                                {mainImageUrl ? (
+                                    <div style={{ position: 'relative' }}>
+                                        <img src={mainImageUrl} alt={dog.name} className="dog-card-img" />
+                                        {dog.images.length > 1 && (
+                                            <span style={{ position: 'absolute', bottom: '5px', right: '5px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '2px 6px', borderRadius: '3px', fontSize: '12px' }}>
+                                                +{dog.images.length - 1} fotek
+                                            </span>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="dog-card-placeholder">Bez fotky</div>
+                                )}
 
-                            <div className="card-actions">
-                                <button onClick={() => handleStartEdit(dog)} className="edit-btn">Upravit</button>
-                                <button onClick={() => handleDelete(dog.id, dog.name)} className="delete-btn">Smazat</button>
+                                <h3>{dog.name}</h3>
+                                <span className={`badge ${dog.gender}`}>{dog.gender === 'male' ? 'Pes' : 'Fena'}</span>
+                                {dog.isReserved && <span className="badge reserved">Zadáno</span>}
+                                <p>{dog.description}</p>
+
+                                <div className="card-actions">
+                                    <button onClick={() => handleStartEdit(dog)} className="edit-btn">Upravit</button>
+                                    <button onClick={() => handleDelete(dog.id, dog.name)} className="delete-btn">Smazat</button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>

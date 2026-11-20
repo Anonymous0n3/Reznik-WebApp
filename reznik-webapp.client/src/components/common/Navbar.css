@@ -1,3 +1,4 @@
+/*Navbar.css*/
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -68,4 +69,65 @@
 
 .lang-divider {
     opacity: 0.5;
+}
+
+/* Skryjeme hamburger menu na PC */
+.hamburger {
+    display: none;
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    color: var(--text-light, #fff); /* Použij svou proměnnou nebo barvu */
+    cursor: pointer;
+}
+
+/* Úpravy pro mobily */
+@media (max-width: 850px) {
+    .navbar {
+        flex-wrap: wrap; /* Umožní prvkům se přeskládat */
+    }
+
+    .hamburger {
+        display: block;
+        order: 2; /* Umístí hamburger menu doprava */
+    }
+
+    .language-switcher {
+        order: 1; /* Umístí přepínač jazyků mezi logo a hamburger */
+        margin-left: auto;
+        margin-right: 1rem;
+    }
+
+    .navbar-links {
+        display: none; /* Skryjeme odkazy ve výchozím stavu */
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
+        padding-top: 1rem;
+        order: 3; /* Odkazy budou na novém řádku dole */
+    }
+
+        /* Když je menu aktivní (kliknuto), zobrazíme ho */
+        .navbar-links.active {
+            display: flex;
+        }
+
+        .navbar-links a {
+            display: block;
+            padding: 0.5rem 0;
+        }
+}
+
+/* Úprava stávající třídy pro zarovnání textu a loga vedle sebe */
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Mezera mezi logem a názvem stanice */
+}
+
+/* Nastavení velikosti loga */
+.fci-logo {
+    height: 40px; /* Výšku upravte podle toho, jak velké logo chcete mít */
+    width: auto;
+    display: block;
 }

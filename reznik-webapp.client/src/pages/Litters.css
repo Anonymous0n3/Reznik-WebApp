@@ -1,3 +1,4 @@
+/*Litters.css*/
 .litters-page h1 {
     margin-bottom: 0.5rem;
     color: var(--primary-color);
@@ -141,5 +142,67 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0.4rem;
+    }
+}
+
+/* --- Zobrazení rodičů ve PlannedLitterCard --- */
+
+.planned-parents-header {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #eaeaea;
+}
+
+.parent-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 40%;
+}
+
+.parent-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%; /* Kulaté profilovky */
+    border: 3px solid white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 0.5rem;
+}
+
+.parent-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.parent-role {
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.parents-divider {
+    font-size: 2rem;
+    color: #ccc;
+    font-weight: 300;
+}
+
+/* Úprava pro mobily - zmenšení obrázků */
+@media (max-width: 600px) {
+    .parent-img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .parent-name {
+        font-size: 1rem;
     }
 }

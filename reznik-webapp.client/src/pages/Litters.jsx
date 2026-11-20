@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import DogCard from '../components/common/DogCard';
 import './Litters.css';
 
+// Vyměňte stávající PlannedLitterCard za tuto verzi:
+
 function PlannedLitterCard({ litter }) {
     const { t } = useTranslation();
     const [showReservations, setShowReservations] = useState(false);
@@ -27,9 +29,34 @@ function PlannedLitterCard({ litter }) {
         fetchReservations();
     }, [litter.id]);
 
+    // ZMĚNA: Extrakce profilových fotek rodičů (bereme vždy první fotku z pole)
+    const damHasImages = litter.dam?.images && litter.dam.images.length > 0;
+    const damImage = damHasImages ? litter.dam.images[0].url : '/placeholder-dog.jpg';
+
+    const sireHasImages = litter.sire?.images && litter.sire.images.length > 0;
+    const sireImage = sireHasImages ? litter.sire.images[0].url : '/placeholder-dog.jpg';
+
     return (
         <div className="planned-card">
-            <h2>{t('litters.litterWord')}: {litter.dam?.name || 'Neznámá'} ♀ × {litter.sire?.name || 'Neznámý'} ♂</h2>
+
+            {/* ZMĚNA: Přidána vizuální hlavička s fotkami rodičů */}
+            <div className="planned-parents-header">
+                <div className="parent-profile dam">
+                    <img src={damImage} alt={litter.dam?.name || 'Neznámá'} className="parent-img" />
+                    <span className="parent-name">{litter.dam?.name || 'Neznámá'} ♀</span>
+                    <span className="parent-role">{t('litters.dam', 'Matka')}</span>
+                </div>
+
+                <div className="parents-divider">
+                    <span>×</span>
+                </div>
+
+                <div className="parent-profile sire">
+                    <img src={sireImage} alt={litter.sire?.name || 'Neznámý'} className="parent-img" />
+                    <span className="parent-name">{litter.sire?.name || 'Neznámý'} ♂</span>
+                    <span className="parent-role">{t('litters.sire', 'Otec')}</span>
+                </div>
+            </div>
 
             <div className="planned-details">
                 <p><strong>{t('litters.expectedDate')}:</strong> {litter.expectedDate}</p>
@@ -122,7 +149,8 @@ export default function Litters({ status }) {
                                 <DogCard
                                     key={puppy.id}
                                     name={puppy.name}
-                                    image={puppy.imageUrl}
+                                    // ZMĚNA ZDE: image={puppy.imageUrl} bylo nahrazeno za images={puppy.images}
+                                    images={puppy.images}
                                     description={puppy.colorInfo}
                                     gender={puppy.gender}
                                     isReserved={puppy.status !== 'available'}

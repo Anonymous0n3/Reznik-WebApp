@@ -58,9 +58,6 @@ namespace Reznik_WebApp.Server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsReserved")
                         .HasColumnType("boolean");
 
@@ -71,6 +68,28 @@ namespace Reznik_WebApp.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Dogs");
+                });
+
+            modelBuilder.Entity("Reznik_WebApp.Server.Models.DogImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DogId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DogId");
+
+                    b.ToTable("DogImages");
                 });
 
             modelBuilder.Entity("Reznik_WebApp.Server.Models.GalleryImage", b =>
@@ -149,9 +168,6 @@ namespace Reznik_WebApp.Server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
-
                     b.Property<int>("LitterId")
                         .HasColumnType("integer");
 
@@ -168,6 +184,28 @@ namespace Reznik_WebApp.Server.Migrations
                     b.HasIndex("LitterId");
 
                     b.ToTable("Puppies");
+                });
+
+            modelBuilder.Entity("Reznik_WebApp.Server.Models.PuppyImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PuppyId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PuppyId");
+
+                    b.ToTable("PuppyImages");
                 });
 
             modelBuilder.Entity("Reznik_WebApp.Server.Models.Reservation", b =>
@@ -194,6 +232,17 @@ namespace Reznik_WebApp.Server.Migrations
                     b.HasIndex("LitterId");
 
                     b.ToTable("Reservations");
+                });
+
+            modelBuilder.Entity("Reznik_WebApp.Server.Models.DogImage", b =>
+                {
+                    b.HasOne("Reznik_WebApp.Server.Models.Dog", "Dog")
+                        .WithMany("Images")
+                        .HasForeignKey("DogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dog");
                 });
 
             modelBuilder.Entity("Reznik_WebApp.Server.Models.Litter", b =>
@@ -226,6 +275,17 @@ namespace Reznik_WebApp.Server.Migrations
                     b.Navigation("Litter");
                 });
 
+            modelBuilder.Entity("Reznik_WebApp.Server.Models.PuppyImage", b =>
+                {
+                    b.HasOne("Reznik_WebApp.Server.Models.Puppy", "Puppy")
+                        .WithMany("Images")
+                        .HasForeignKey("PuppyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Puppy");
+                });
+
             modelBuilder.Entity("Reznik_WebApp.Server.Models.Reservation", b =>
                 {
                     b.HasOne("Reznik_WebApp.Server.Models.Litter", "Litter")
@@ -237,9 +297,19 @@ namespace Reznik_WebApp.Server.Migrations
                     b.Navigation("Litter");
                 });
 
+            modelBuilder.Entity("Reznik_WebApp.Server.Models.Dog", b =>
+                {
+                    b.Navigation("Images");
+                });
+
             modelBuilder.Entity("Reznik_WebApp.Server.Models.Litter", b =>
                 {
                     b.Navigation("Reservations");
+                });
+
+            modelBuilder.Entity("Reznik_WebApp.Server.Models.Puppy", b =>
+                {
+                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

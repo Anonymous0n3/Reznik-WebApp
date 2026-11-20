@@ -19,7 +19,11 @@ namespace Reznik_WebApp.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDogs()
         {
-            var dogs = await _context.Dogs.ToListAsync();
+            // PŘIDÁNO: .Include(d => d.Images) zajistí, že se z databáze vytáhnou i navázané fotky
+            var dogs = await _context.Dogs
+                .Include(d => d.Images)
+                .ToListAsync();
+
             return Ok(dogs);
         }
 
@@ -47,7 +51,12 @@ namespace Reznik_WebApp.Server.Controllers
                 return BadRequest("ID v adrese se neshoduje s ID v zaslaných datech.");
             }
 
-            var existingDog = await _context.Dogs.FindAsync(id);
+            // ZMĚNA: Místo FindAsync musíme použít FirstOrDefaultAsync s Include, 
+            // abychom do paměti načetli i existující fotky, které budeme měnit
+            var existingDog = await _context.Dogs
+                .Include(d => d.Images)
+                .FirstOrDefaultAsync(d => d.Id == id);
+
             if (existingDog == null)
             {
                 return NotFound("Pes s tímto ID neexistuje.");
@@ -56,8 +65,12 @@ namespace Reznik_WebApp.Server.Controllers
             existingDog.Name = updatedDog.Name;
             existingDog.Gender = updatedDog.Gender;
             existingDog.Description = updatedDog.Description;
-            existingDog.ImageUrl = updatedDog.ImageUrl;
             existingDog.IsReserved = updatedDog.IsReserved;
+
+            // ZMĚNA: Odstraněno existingDog.ImageUrl = updatedDog.ImageUrl;
+            // Místo toho smažeme staré fotky z databáze a nahradíme je novými z požadavku
+            _context.DogImages.RemoveRange(existingDog.Images);
+            existingDog.Images = updatedDog.Images;
 
             await _context.SaveChangesAsync();
 

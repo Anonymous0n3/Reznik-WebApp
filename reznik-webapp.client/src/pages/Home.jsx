@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import './Home.css';
 
-import heroImage from '../assets/react.svg';
+import heroImage from '../assets/main_log.jpg';
 
 export default function Home() {
     const { t } = useTranslation();
@@ -11,7 +11,7 @@ export default function Home() {
             <header
                 className="hero-banner"
                 style={{
-                    height: '400px',
+                    height: '900px',
                     backgroundImage: `url(${heroImage})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',

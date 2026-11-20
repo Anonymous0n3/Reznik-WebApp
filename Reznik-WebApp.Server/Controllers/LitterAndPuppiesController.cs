@@ -21,7 +21,9 @@ namespace Reznik_WebApp.Server.Controllers
         {
             var litters = await _context.Litters
                 .Include(l => l.Sire)
+                    .ThenInclude(s => s.Images) // ZMĚNA: Načtení fotek otce
                 .Include(l => l.Dam)
+                    .ThenInclude(d => d.Images) // ZMĚNA: Načtení fotek matky
                 .ToListAsync();
 
             return Ok(litters);
@@ -32,7 +34,9 @@ namespace Reznik_WebApp.Server.Controllers
         {
             var litter = await _context.Litters
                 .Include(l => l.Sire)
+                    .ThenInclude(s => s.Images) // ZMĚNA: Načtení fotek otce
                 .Include(l => l.Dam)
+                    .ThenInclude(d => d.Images) // ZMĚNA: Načtení fotek matky
                 .FirstOrDefaultAsync(l => l.Id == id);
 
             if (litter == null)

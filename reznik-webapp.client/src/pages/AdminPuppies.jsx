@@ -15,8 +15,10 @@ export default function AdminPuppies() {
     const [gender, setGender] = useState('male');
     const [status, setStatus] = useState('available');
     const [colorInfo, setColorInfo] = useState('');
-    const [imageFile, setImageFile] = useState(null);
-    const [currentImageUrl, setCurrentImageUrl] = useState('');
+
+    // ZMĚNA: Stavy pro více fotek
+    const [imageFiles, setImageFiles] = useState([]);
+    const [existingImages, setExistingImages] = useState([]);
 
     useEffect(() => {
         fetchLitters();
@@ -43,8 +45,8 @@ export default function AdminPuppies() {
         setGender('male');
         setStatus('available');
         setColorInfo('');
-        setImageFile(null);
-        setCurrentImageUrl('');
+        setImageFiles([]);
+        setExistingImages([]);
         setEditingPuppyId(null);
         const fileInput = document.getElementById('puppy-image-input');
         if (fileInput) fileInput.value = '';
@@ -56,41 +58,59 @@ export default function AdminPuppies() {
         setGender(puppy.gender);
         setStatus(puppy.status);
         setColorInfo(puppy.colorInfo || '');
-        setCurrentImageUrl(puppy.imageUrl || '');
-        setImageFile(null);
+        // ZMĚNA: Načtení pole existujících fotek
+        setExistingImages(puppy.images || []);
+        setImageFiles([]);
         setMessage('');
         setError('');
+    };
+
+    // ZMĚNA: Smazání existující fotky z náhledu
+    const handleRemoveExistingImage = (indexToRemove) => {
+        setExistingImages(prev => prev.filter((_, index) => index !== indexToRemove));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!selectedLitterId) return setError('Vyberte vrh.');
         setError('');
-        setMessage('Ukládám...');
+        setMessage('Ukládám data...');
 
-        let finalImageUrl = currentImageUrl;
+        let newlyUploadedImages = [];
 
-        if (imageFile) {
-            const formData = new FormData();
-            formData.append('file', imageFile);
-            try {
-                const uploadRes = await fetch('/api/Upload', { method: 'POST', credentials: 'include', body: formData });
-                if (uploadRes.ok) {
-                    const data = await uploadRes.json();
-                    finalImageUrl = data.imageUrl;
-                } else throw new Error('Chyba fotky');
-            } catch (err) {
-                return setError('Nepodařilo se nahrát fotku.');
+        // ZMĚNA: Nahrání všech nových fotek
+        if (imageFiles.length > 0) {
+            for (let i = 0; i < imageFiles.length; i++) {
+                const formData = new FormData();
+                formData.append('file', imageFiles[i]);
+                try {
+                    const uploadRes = await fetch('/api/Upload', { method: 'POST', credentials: 'include', body: formData });
+                    if (uploadRes.ok) {
+                        const data = await uploadRes.json();
+                        newlyUploadedImages.push({ url: data.imageUrl });
+                    } else throw new Error('Chyba fotky');
+                } catch (err) {
+                    return setError(`Nepodařilo se nahrát fotku č. ${i + 1}.`);
+                }
             }
         }
 
         const isEditing = editingPuppyId !== null;
         const url = isEditing ? `/api/Puppies/${editingPuppyId}` : '/api/Puppies';
 
+        // ZMĚNA: Sloučení ponechaných starých a nových fotek
+        const finalImagesList = [
+            ...existingImages.map(img => ({ url: img.url })),
+            ...newlyUploadedImages
+        ];
+
         const puppyData = {
             id: isEditing ? editingPuppyId : 0,
-            name, gender, status, colorInfo,
-            imageUrl: finalImageUrl,
+            name,
+            gender,
+            status,
+            colorInfo,
+            images: finalImagesList, // ZMĚNA: Odeslání pole images
             litterId: parseInt(selectedLitterId)
         };
 
@@ -124,6 +144,7 @@ export default function AdminPuppies() {
     const translateStatus = (s) => {
         if (s === 'available') return 'Volné';
         if (s === 'reserved') return 'Zadané';
+        if (s === 'sold') return 'V novém domově';
         return s;
     };
 
@@ -178,16 +199,57 @@ export default function AdminPuppies() {
                         </div>
 
                         <div className="form-group">
-                            <label>Fotografie:</label>
-                            <input id="puppy-image-input" type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0])} />
-                            {currentImageUrl && !imageFile && (
-                                <img src={currentImageUrl} alt="Aktuální" style={{ width: '80px', marginTop: '10px', borderRadius: '5px' }} />
+                            <label>Fotografie (můžete vybrat více):</label>
+                            <input
+                                id="puppy-image-input"
+                                type="file"
+                                accept="image/*"
+                                multiple // ZMĚNA: Povolen výběr více souborů
+                                onChange={e => setImageFiles(Array.from(e.target.files))}
+                            />
+
+                            {/* Zobrazení vybraných nových fotek */}
+                            {imageFiles.length > 0 && (
+                                <div style={{ marginTop: '10px' }}>
+                                    <small>Nové fotky k nahrání:</small>
+                                    <ul>
+                                        {imageFiles.map((file, i) => (
+                                            <li key={i}>{file.name}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {/* Zobrazení existujících fotek */}
+                            {existingImages.length > 0 && (
+                                <div style={{ marginTop: '15px' }}>
+                                    <small>Uložené fotky (kliknutím na křížek smažete):</small>
+                                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '5px' }}>
+                                        {existingImages.map((img, index) => (
+                                            <div key={index} style={{ position: 'relative' }}>
+                                                <img src={img.url} alt={`Uložená ${index}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '5px' }} />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveExistingImage(index)}
+                                                    style={{
+                                                        position: 'absolute', top: '-5px', right: '-5px',
+                                                        background: 'red', color: 'white', border: 'none',
+                                                        borderRadius: '50%', width: '22px', height: '22px',
+                                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                                    }}
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             )}
                         </div>
 
                         <div className="form-actions">
-                            <button type="submit" className="submit-btn">{editingPuppyId ? 'Uložit' : 'Přidat'}</button>
-                            {editingPuppyId && <button type="button" onClick={resetForm} className="cancel-btn">Zrušit</button>}
+                            <button type="submit" className="submit-btn">{editingPuppyId ? 'Uložit změny' : 'Přidat štěně'}</button>
+                            {editingPuppyId && <button type="button" onClick={resetForm} className="cancel-btn">Zrušit úpravu</button>}
                         </div>
                     </form>
                 )}
@@ -197,24 +259,37 @@ export default function AdminPuppies() {
                 <div className="admin-list-section">
                     <h2>Štěňata ve vrhu ({puppies.length})</h2>
                     <div className="dogs-grid">
-                        {puppies.map(puppy => (
-                            <div key={puppy.id} className="dog-card">
-                                {puppy.imageUrl ? (
-                                    <img src={puppy.imageUrl} alt={puppy.name} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '6px' }} />
-                                ) : (
-                                    <div style={{ width: '100%', height: '150px', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px' }}>Bez fotky</div>
-                                )}
+                        {puppies.map(puppy => {
+                            // ZMĚNA: Bezpečné získání prvního obrázku
+                            const hasImages = puppy.images && puppy.images.length > 0;
+                            const mainImg = hasImages ? puppy.images[0].url : null;
 
-                                <h3 style={{ marginTop: '10px' }}>{puppy.name}</h3>
-                                <p><strong>{translateStatus(puppy.status)}</strong></p>
-                                <p>{puppy.gender === 'male' ? 'Pes' : 'Fena'} | {puppy.colorInfo}</p>
+                            return (
+                                <div key={puppy.id} className={`dog-card ${editingPuppyId === puppy.id ? 'editing' : ''}`}>
+                                    {mainImg ? (
+                                        <div style={{ position: 'relative' }}>
+                                            <img src={mainImg} alt={puppy.name} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '6px' }} />
+                                            {puppy.images.length > 1 && (
+                                                <span style={{ position: 'absolute', bottom: '5px', right: '5px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '2px 6px', borderRadius: '3px', fontSize: '12px' }}>
+                                                    +{puppy.images.length - 1} fotek
+                                                </span>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div style={{ width: '100%', height: '150px', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px' }}>Bez fotky</div>
+                                    )}
 
-                                <div className="card-actions">
-                                    <button onClick={() => handleStartEdit(puppy)} className="edit-btn">Upravit</button>
-                                    <button onClick={() => handleDelete(puppy.id, puppy.name)} className="delete-btn">Smazat</button>
+                                    <h3 style={{ marginTop: '10px' }}>{puppy.name}</h3>
+                                    <p><strong>{translateStatus(puppy.status)}</strong></p>
+                                    <p>{puppy.gender === 'male' ? 'Pes' : 'Fena'} | {puppy.colorInfo}</p>
+
+                                    <div className="card-actions">
+                                        <button onClick={() => handleStartEdit(puppy)} className="edit-btn">Upravit</button>
+                                        <button onClick={() => handleDelete(puppy.id, puppy.name)} className="delete-btn">Smazat</button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}

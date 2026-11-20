@@ -52,7 +52,8 @@ export default function Dogs({ gender }) {
                             <DogCard
                                 key={dog.id}
                                 name={dog.name}
-                                image={dog.imageUrl}
+                                // OPRAVA ZDE: Místo image={dog.imageUrl} dáváme images={dog.images}
+                                images={dog.images}
                                 description={dog.description}
                                 gender={dog.gender}
                             />

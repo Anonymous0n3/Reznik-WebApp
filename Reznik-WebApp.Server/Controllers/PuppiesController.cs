@@ -15,7 +15,12 @@ namespace Reznik_WebApp.Server.Controllers
         [HttpGet("bylitter/{litterId}")]
         public async Task<IActionResult> GetPuppiesByLitter(int litterId)
         {
-            var puppies = await _context.Puppies.Where(p => p.LitterId == litterId).ToListAsync();
+            // ZMĚNA: Načítáme i pole fotek pomocí Include
+            var puppies = await _context.Puppies
+                .Include(p => p.Images)
+                .Where(p => p.LitterId == litterId)
+                .ToListAsync();
+
             return Ok(puppies);
         }
 
@@ -34,14 +39,22 @@ namespace Reznik_WebApp.Server.Controllers
         public async Task<IActionResult> UpdatePuppy(int id, [FromBody] Puppy updatedPuppy)
         {
             if (id != updatedPuppy.Id) return BadRequest();
-            var existing = await _context.Puppies.FindAsync(id);
+
+            // ZMĚNA: Musíme vytáhnout i navázané fotky
+            var existing = await _context.Puppies
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (existing == null) return NotFound();
 
             existing.Name = updatedPuppy.Name;
             existing.Gender = updatedPuppy.Gender;
             existing.Status = updatedPuppy.Status;
             existing.ColorInfo = updatedPuppy.ColorInfo;
-            existing.ImageUrl = updatedPuppy.ImageUrl;
+
+            // ZMĚNA: Přepsání starých fotek za nové
+            _context.PuppyImages.RemoveRange(existing.Images);
+            existing.Images = updatedPuppy.Images;
 
             await _context.SaveChangesAsync();
             return NoContent();
