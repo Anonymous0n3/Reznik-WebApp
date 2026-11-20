@@ -1,3 +1,3 @@
-:80 {
+redfoxlabradorparadise.com, www.redfoxlabradorparadise.com {
     reverse_proxy webapp:8080
 }
